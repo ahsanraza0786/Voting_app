@@ -1,0 +1,9 @@
+{
+  "name": "Test User 3",
+  "email": "test3@example.com",
+  "password": "TestPass123",
+  "age": 28,
+  "address": "456 Test Blvd",
+  "mobile": "9876543212",
+  "aadharCardNumber": "123412341236"
+}
