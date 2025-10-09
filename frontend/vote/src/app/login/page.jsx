@@ -50,7 +50,7 @@ export default function Login() {
       // Fetch user profile to determine role
       let role = null;
       try {
-        const profileRes = await fetch('http://localhost:8080/user/profile', {
+        const profileRes = await fetch(`${base}/user/profile`, {
           headers: { 'Authorization': `Bearer ${data.token}` }
         });
         const profileData = await profileRes.json();

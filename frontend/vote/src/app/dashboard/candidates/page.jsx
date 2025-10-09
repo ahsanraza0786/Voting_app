@@ -26,7 +26,7 @@ export default function CandidatesAdmin(){
       return;
     }
     // fetch profile to check admin
-    fetch('http://localhost:8080/user/profile', { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${base}/user/profile`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r=>r.json())
       .then(data=>{
         if(!data.user || data.user.role !== 'admin'){
