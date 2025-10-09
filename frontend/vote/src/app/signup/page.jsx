@@ -80,7 +80,7 @@ export default function SignUp() {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/user/signup', {
+      const response = await fetch(`${base}/user/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
