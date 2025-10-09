@@ -5,6 +5,9 @@ import { FiMail, FiLock, FiEye, FiEyeOff, FiLoader, FiAlertCircle } from 'react-
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+const base = process.env.NEXT_PUBLIC_API_BASE;
+
+
 export default function Login() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -191,12 +194,12 @@ export default function Login() {
               </div>
 
               <div className="text-sm">
-                <Link
+                {/* <Link
                   href="/forgot-password"
                   className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Forgot password?
-                </Link>
+                </Link> */}
               </div>
             </div>
 
