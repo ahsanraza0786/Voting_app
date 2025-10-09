@@ -10,6 +10,8 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:5173',
   'http://localhost:300',
+ 'https://voting-app-rust.vercel.app', // frontend URL
+    
 ];
 
 const corsOptions = {
