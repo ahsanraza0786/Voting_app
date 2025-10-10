@@ -5,15 +5,17 @@
 //     }
 //   }
 // }
+
+
 {
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]
     },
-    "ignoreDeprecations": "6.0",
-    "checkJs": false
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src"]
 }
+
 
