@@ -11,8 +11,9 @@
     "paths": {
       "@/*": ["*"]
     },
-    "checkJs": false,
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "checkJs": false
   },
   "include": ["src"]
 }
+
