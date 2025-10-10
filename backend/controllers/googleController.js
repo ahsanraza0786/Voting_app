@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const User = require("./models/user");
+const User = require('../models/user');
+
 const client = require("../google/googleClient");
 
 exports.googleLogin = async (req, res) => {
