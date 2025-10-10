@@ -47,9 +47,9 @@ export default function Login() {
         throw new Error(data.message || 'Login failed');
       }
 
-  // Store the token
-  if (data.token) localStorage.setItem('token', data.token);
-      
+      // Store the token
+      if (data.token) localStorage.setItem('token', data.token);
+
       // Fetch user profile to determine role
       let role = null;
       try {
@@ -129,20 +129,20 @@ export default function Login() {
             {/* Email Input */}
             <div>
               <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Aadhar Card Number
-                </label>
+                Aadhar Card Number
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiMail className="h-5 w-5 text-blue-300" />
                 </div>
                 <input
-                    type="text"
-                    name="aadharCardNumber"
-                    value={formData.aadharCardNumber}
+                  type="text"
+                  name="aadharCardNumber"
+                  value={formData.aadharCardNumber}
                   onChange={handleChange}
                   required
-                    className="bg-white/10 w-full pl-10 pr-3 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="123412341234"
+                  className="bg-white/10 w-full pl-10 pr-3 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="123412341234"
                 />
               </div>
             </div>
@@ -249,36 +249,19 @@ export default function Login() {
                 <div className="w-full border-t border-white/20"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-transparent text-blue-200">Or continue with</span>
+                <span className="px-2 bg-transparent text-blue-200">
+                  Or continue with
+                </span>
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all duration-300"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12.0003 2C6.4773 2 2.0003 6.477 2.0003 12C2.0003 17.523 6.4773 22 12.0003 22C17.5233 22 22.0003 17.523 22.0003 12C22.0003 6.477 17.5233 2 12.0003 2ZM14.5833 16.297C14.1053 16.715 11.5003 14.725 11.5003 14.725C11.5003 14.725 8.8943 16.715 8.4173 16.297C7.9393 15.879 9.9293 13.274 9.9293 13.274C9.9293 13.274 7.9393 10.669 8.4173 10.251C8.8943 9.833 11.5003 11.823 11.5003 11.823C11.5003 11.823 14.1053 9.833 14.5833 10.251C15.0603 10.669 13.0703 13.274 13.0703 13.274C13.0703 13.274 15.0603 15.879 14.5833 16.297Z" />
-                </svg>
-                <span className="ml-2">Google</span>
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-all duration-300"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.477 2 2 6.477 2 12C2 16.991 5.657 21.128 10.438 21.879V14.89H7.898V12H10.438V9.797C10.438 7.291 11.93 5.907 14.215 5.907C15.309 5.907 16.453 6.102 16.453 6.102V8.562H15.193C13.95 8.562 13.563 9.333 13.563 10.124V12H16.336L15.893 14.89H13.563V21.879C18.343 21.129 22 16.99 22 12C22 6.477 17.523 2 12 2Z" />
-                </svg>
-                <span className="ml-2">Facebook</span>
-              </motion.button>
+            <div className="mt-6 flex justify-center">
+              <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+                <GoogleLoginButton />
+              </GoogleOAuthProvider>
             </div>
           </div>
+
         </div>
       </motion.div>
     </div>

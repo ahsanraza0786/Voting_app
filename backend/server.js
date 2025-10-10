@@ -57,6 +57,21 @@ app.use("/candidate", candidateRoutes);
 app.use("/election", electionRoutes);
 app.use("/vote", voteRoutes);
 
+
+// Import Google OAuth authentication routes from the googleRoutes module
+// This module contains endpoints for handling Google authentication flow
+const googleRoutes = require("./routes/googleRoutes");
+
+// Mount the Google authentication routes under the "/api/auth" base path
+// This means all routes defined in googleRoutes will be accessible at:
+// - /api/auth/google (initiates Google OAuth)
+// - /api/auth/google/callback (handles OAuth callback from Google)
+// - /api/auth/google/success (returns success response after authentication)
+// - /api/auth/google/failure (handles authentication failures)
+
+app.use("/api/auth", googleRoutes);
+
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
