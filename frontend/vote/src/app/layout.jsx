@@ -48,7 +48,7 @@
 
 import "./globals.css";
 import { Inter } from "next/font/google";
-import GoogleProviderWrapper from "./providers/GoogleProviderWrapper"; // 👈 import provider
+import GoogleProviderWrapper from "../providers/GoogleProviderWrapper"; // 👈 import provider
 
 const inter = Inter({ subsets: ["latin"] });
 

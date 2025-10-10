@@ -1,6 +1,6 @@
 "use client";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import { motion } from "framer-motion";
 import { FiCheck, FiClock, FiAlertCircle } from "react-icons/fi";
 import Image from "next/image";

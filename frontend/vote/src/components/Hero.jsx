@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight, FiCheck, FiShield, FiLock, FiSmartphone } from "react-icons/fi";
 import '../styles/hero.css';
 
+
 const Hero = () => {
   const [isAdmin, setIsAdmin] = useState(false);
 

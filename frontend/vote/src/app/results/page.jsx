@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CountUp from "react-countup";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import { FiBarChart2, FiRefreshCcw, FiSearch, FiChevronRight } from "react-icons/fi";
 
 export default function ResultsPage() {

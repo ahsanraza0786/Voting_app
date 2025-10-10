@@ -1,6 +1,5 @@
 "use client";
 
-import { GoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 
 export default function GoogleLoginButton() {

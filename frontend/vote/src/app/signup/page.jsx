@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiCheckCircle, FiLoader, FiPhone, FiMapPin, FiHash, FiCalendar } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import '../styles/signup.css';
+import '../../styles/signup.css';
+
+
 
 export default function SignUp() {
   const router = useRouter();
