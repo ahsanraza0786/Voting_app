@@ -292,14 +292,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-// Because your providers and components are under src/providers and src/components:
-import GoogleProviderWrapper from "../../../providers/GoogleProviderWrapper";
 
-// dynamic import for the button to avoid SSR issues
 const GoogleLoginButton = dynamic(
-  () => import("../../../components/GoogleLoginButton"),
+  () => import('@/components/GoogleLoginButton'),
   { ssr: false }
 );
+
+
+import GoogleProviderWrapper from "@/providers/GoogleProviderWrapper";
+
 
 const base = process.env.NEXT_PUBLIC_API_BASE;
 
