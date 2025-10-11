@@ -46,26 +46,18 @@
 //   );
 // }
 
+// app/layout.jsx
 import "./globals.css";
-import { Inter } from "next/font/google";
-import GoogleProviderWrapper from "../providers/GoogleProviderWrapper"; // 👈 import provider
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata = {
-  title: "Voting App",
-  description: "Online Voting System",
-};
+import GoogleProvider from "./providers/GoogleProvider";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <GoogleProviderWrapper>   {/* 👈 wrap everything */}
-          {children}
-        </GoogleProviderWrapper>
+      <body>
+        <GoogleProvider>{children}</GoogleProvider>
       </body>
     </html>
   );
 }
+
 
