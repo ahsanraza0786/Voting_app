@@ -24,7 +24,7 @@ const GoogleLoginButton = dynamic(
 );
 
 
-import GoogleProviderWrapper from "@/app/providers/GoogleProviderWrapper";
+import GoogleProvider from "@/app/providers/GoogleProvider";
 
 
 const base = process.env.NEXT_PUBLIC_API_BASE;
@@ -217,9 +217,9 @@ export default function Login() {
               </span>
             </div>
             <div className="mt-4 flex justify-center">
-              <GoogleProviderWrapper>
+              <GoogleProvider>
                 <GoogleLoginButton />
-              </GoogleProviderWrapper>
+              </GoogleProvider>
             </div>
           </div>
 

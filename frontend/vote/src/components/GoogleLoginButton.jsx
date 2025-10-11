@@ -114,7 +114,9 @@
 // }"use client";
 
 import { GoogleLogin } from "@react-oauth/google";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+
+
 
 export default function GoogleLoginButton() {
   const handleSuccess = (credentialResponse) => {
