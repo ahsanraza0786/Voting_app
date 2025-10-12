@@ -2,40 +2,22 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  FiMail,
-  FiLock,
-  FiEye,
-  FiEyeOff,
-  FiLoader,
-  FiAlertCircle,
-} from "react-icons/fi";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiLoader } from "react-icons/fi";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import GoogleProviderWrapper from "@/app/providers/googleProvider";
 
 const GoogleLoginButton = dynamic(
-  () => import('@/components/GoogleLoginButton'),
+  () => import("@/components/GoogleLoginButton"),
   { ssr: false }
 );
 
-import GoogleProviderWrapper from "@/app/providers/googleProvider";
-
-const base = process.env.NEXT_PUBLIC_API_BASE;
-
 export default function Login() {
-  const router = useRouter();
-
-  const [formData, setFormData] = useState({
-    aadharCardNumber: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ aadharCardNumber: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [shake, setShake] = useState(false);
-
-  const [googleUser, setGoogleUser] = useState(null); // new state for Google login
+  const [googleUser, setGoogleUser] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,194 +30,116 @@ export default function Login() {
     setError("");
 
     try {
-      const response = await fetch(`${base}/user/login`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Login failed");
-
-      if (data.token) localStorage.setItem("token", data.token);
-
-      const profileRes = await fetch(`${base}/user/profile`, {
-        headers: { Authorization: `Bearer ${data.token}` },
-      });
-      const profileData = await profileRes.json();
-      const role = profileData.user?.role;
-      if (role) localStorage.setItem("role", role);
-
-      if (role === "admin") router.push("/election-management");
-      else router.push("/voting-booth");
+      localStorage.setItem("token", data.token);
+      alert("Logged in successfully!");
     } catch (err) {
       setError(err.message || "Invalid credentials");
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleSuccess = (credentialResponse) => {
+    console.log("Google Credential:", credentialResponse);
+    setGoogleUser(credentialResponse);
+    alert("Google login successful! Check console for details.");
+  };
+
+  const handleGoogleError = () => {
+    alert("Google login failed!");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-violet-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10"></div>
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-1/4 left-1/2 w-96 h-96 bg-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
-        </div>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md w-full space-y-8 relative"
-      >
+      <div className="max-w-md w-full space-y-8 relative">
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20">
           <div className="text-center mb-8">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="text-3xl font-bold text-white mb-2"
-            >
-              {googleUser ? "Welcome!" : "Welcome Back"}
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-blue-200"
-            >
-              {googleUser
-                ? `You are logged in as ${googleUser.email}`
-                : "Sign in to your account"}
-            </motion.p>
+            <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+            <p className="text-blue-200">Sign in to your account</p>
           </div>
 
-          {!googleUser ? (
-            <motion.form
-              onSubmit={handleSubmit}
-              className="space-y-6"
-              animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
-              transition={{ duration: 0.4 }}
-            >
-              <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Aadhar Card Number
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiMail className="h-5 w-5 text-blue-300" />
-                  </div>
-                  <input
-                    type="text"
-                    name="aadharCardNumber"
-                    value={formData.aadharCardNumber}
-                    onChange={handleChange}
-                    required
-                    className="bg-white/10 w-full pl-10 pr-3 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="123412341234"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-blue-200 text-sm font-medium mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiLock className="h-5 w-5 text-blue-300" />
-                  </div>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="bg-white/10 w-full pl-10 pr-10 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    {showPassword ? (
-                      <FiEyeOff className="h-5 w-5 text-blue-300 hover:text-blue-200 transition-colors" />
-                    ) : (
-                      <FiEye className="h-5 w-5 text-blue-300 hover:text-blue-200 transition-colors" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 text-red-400 text-sm"
-                >
-                  <FiAlertCircle className="h-4 w-4" />
-                  <span>{error}</span>
-                </motion.div>
-              )}
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                disabled={loading}
-                className="w-full flex items-center justify-center py-3 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-300"
-              >
-                {loading ? <FiLoader className="w-5 h-5 animate-spin" /> : "Sign In"}
-              </motion.button>
-
-              <p className="text-center text-blue-200">
-                Don't have an account?{" "}
-                <Link
-                  href="/signup"
-                  className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Sign up
-                </Link>
-              </p>
-            </motion.form>
-          ) : (
-            <div className="text-center text-white p-8">
-              <h2 className="text-2xl font-bold">You are logged in!</h2>
-              <p>Google email: {googleUser.email}</p>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-blue-200 text-sm font-medium mb-2">Aadhar Card Number</label>
+              <input
+                type="text"
+                name="aadharCardNumber"
+                value={formData.aadharCardNumber}
+                onChange={handleChange}
+                required
+                className="bg-white/10 w-full pl-3 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="123412341234"
+              />
             </div>
-          )}
 
-          {!googleUser && (
-            <div className="mt-8">
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-transparent text-blue-200">
-                  Or continue with
-                </span>
+            <div>
+              <label className="block text-blue-200 text-sm font-medium mb-2">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="bg-white/10 w-full pl-3 pr-10 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? <FiEyeOff className="h-5 w-5 text-blue-300" /> : <FiEye className="h-5 w-5 text-blue-300" />}
+                </button>
               </div>
-              <div className="mt-4 flex justify-center">
-                <GoogleProviderWrapper>
-                  <GoogleLoginButton
-                    onSuccess={(response) => {
-                      console.log("Google User Info:", response);
-                      setGoogleUser(response);
-                    }}
-                    onError={() => {
-                      console.log("Google login failed");
-                    }}
-                  />
-                </GoogleProviderWrapper>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 text-red-400 text-sm">
+                <FiAlertCircle className="h-4 w-4" />
+                <span>{error}</span>
               </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center py-3 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium"
+            >
+              {loading ? <FiLoader className="w-5 h-5 animate-spin" /> : "Sign In"}
+            </button>
+
+            <p className="text-center text-blue-200">
+              Don't have an account?{" "}
+              <Link href="/signup" className="font-medium text-blue-400 hover:text-blue-300">
+                Sign up
+              </Link>
+            </p>
+          </form>
+
+          <div className="mt-8 flex flex-col items-center">
+            <p className="text-blue-200 mb-2">Or continue with</p>
+            <GoogleProviderWrapper>
+              <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+            </GoogleProviderWrapper>
+          </div>
+
+          {googleUser && (
+            <div className="mt-4 p-4 bg-blue-900/20 rounded-lg text-white">
+              <p>Google User Info:</p>
+              <pre>{JSON.stringify(googleUser, null, 2)}</pre>
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
