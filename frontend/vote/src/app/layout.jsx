@@ -47,9 +47,9 @@
 // }
 
 // app/layout.jsx
-import "./globals.css";
-import GoogleProvider from './providers/googleProvider';
 
+import "./globals.css";
+import GoogleProvider from "./providers/googleProvider";
 
 export default function RootLayout({ children }) {
   return (
@@ -60,5 +60,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-
-

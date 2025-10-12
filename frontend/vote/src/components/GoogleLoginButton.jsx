@@ -113,18 +113,36 @@
 //   );
 // }"use client";
 // GoogleLoginButton.jsx
+
+
+
 "use client";
 
-import { GoogleLogin } from "@react-oauth/google";
-import jwt_decode from "jwt-decode";
+import { useGoogleLogin } from "@react-oauth/google";
+import jwtDecode from "jwt-decode";
 
 export default function GoogleLoginButton() {
-  const handleSuccess = (credentialResponse) => {
-    const decoded = jwt_decode(credentialResponse.credential);
-    console.log(decoded);
-  };
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      // Decode JWT to get user info
+      const user = jwtDecode(tokenResponse.credential);
+      console.log("Google User Info:", user);
 
-  const handleError = () => console.error("Login Failed");
+      // You can send this token to your backend for authentication
+      // Example: fetch("/api/google-login", { method: "POST", body: JSON.stringify({ token: tokenResponse.credential }) });
+    },
+    onError: () => {
+      console.log("Login Failed");
+    },
+  });
 
-  return <GoogleLogin onSuccess={handleSuccess} onError={handleError} />;
+  return (
+    <button
+      onClick={() => login()}
+      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+    >
+      Sign in with Google
+    </button>
+  );
 }
+
