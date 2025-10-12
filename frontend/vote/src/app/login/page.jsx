@@ -23,8 +23,8 @@ const GoogleLoginButton = dynamic(
   { ssr: false }
 );
 
+import GoogleProvider from '../providers/GoogleProvider';
 
-import GoogleProvider from "@/app/providers/GoogleProvider";
 
 
 const base = process.env.NEXT_PUBLIC_API_BASE;

@@ -112,29 +112,19 @@
 //     </div>
 //   );
 // }"use client";
+// GoogleLoginButton.jsx
+"use client";
 
 import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
-
+import jwt_decode from "jwt-decode";
 
 export default function GoogleLoginButton() {
   const handleSuccess = (credentialResponse) => {
-    const decoded = jwtDecode(credentialResponse.credential);
-    console.log("Google User Info:", decoded);
-
-    // You can send decoded data to your backend for user registration/login
-    // Example:
-    // fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, { ... })
+    const decoded = jwt_decode(credentialResponse.credential);
+    console.log(decoded);
   };
 
-  const handleError = () => {
-    console.error("Google Login Failed");
-  };
+  const handleError = () => console.error("Login Failed");
 
-  return (
-    <div className="flex justify-center">
-      <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
-    </div>
-  );
+  return <GoogleLogin onSuccess={handleSuccess} onError={handleError} />;
 }

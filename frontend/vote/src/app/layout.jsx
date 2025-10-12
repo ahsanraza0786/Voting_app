@@ -48,7 +48,8 @@
 
 // app/layout.jsx
 import "./globals.css";
-import GoogleProvider from "./providers/GoogleProvider";
+import GoogleProvider from './providers/GoogleProvider';
+
 
 export default function RootLayout({ children }) {
   return (
