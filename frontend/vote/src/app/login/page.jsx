@@ -23,7 +23,7 @@ const GoogleLoginButton = dynamic(
   { ssr: false }
 );
 
-import GoogleProvider from '../providers/GoogleProvider';
+import GoogleProvider from '../providers/googleProvider';
 
 
 
