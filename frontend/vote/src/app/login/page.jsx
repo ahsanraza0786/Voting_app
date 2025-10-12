@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 import { useState } from "react";
@@ -17,20 +14,18 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-
 const GoogleLoginButton = dynamic(
   () => import('@/components/GoogleLoginButton'),
   { ssr: false }
 );
 
-import GoogleProvider from '../providers/googleProvider';
-
-
+import GoogleProviderWrapper from "@/app/providers/googleProvider";
 
 const base = process.env.NEXT_PUBLIC_API_BASE;
 
 export default function Login() {
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     aadharCardNumber: "",
     password: "",
@@ -39,6 +34,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
+
+  const [googleUser, setGoogleUser] = useState(null); // new state for Google login
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -105,7 +102,7 @@ export default function Login() {
               transition={{ delay: 0.2 }}
               className="text-3xl font-bold text-white mb-2"
             >
-              Welcome Back
+              {googleUser ? "Welcome!" : "Welcome Back"}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0 }}
@@ -113,116 +110,130 @@ export default function Login() {
               transition={{ delay: 0.3 }}
               className="text-blue-200"
             >
-              Sign in to your account
+              {googleUser
+                ? `You are logged in as ${googleUser.email}`
+                : "Sign in to your account"}
             </motion.p>
           </div>
 
-          <motion.form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-            animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
-            transition={{ duration: 0.4 }}
-          >
-            <div>
-              <label className="block text-blue-200 text-sm font-medium mb-2">
-                Aadhar Card Number
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiMail className="h-5 w-5 text-blue-300" />
-                </div>
-                <input
-                  type="text"
-                  name="aadharCardNumber"
-                  value={formData.aadharCardNumber}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/10 w-full pl-10 pr-3 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="123412341234"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-blue-200 text-sm font-medium mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiLock className="h-5 w-5 text-blue-300" />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/10 w-full pl-10 pr-10 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <FiEyeOff className="h-5 w-5 text-blue-300 hover:text-blue-200 transition-colors" />
-                  ) : (
-                    <FiEye className="h-5 w-5 text-blue-300 hover:text-blue-200 transition-colors" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 text-red-400 text-sm"
-              >
-                <FiAlertCircle className="h-4 w-4" />
-                <span>{error}</span>
-              </motion.div>
-            )}
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center py-3 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-300"
+          {!googleUser ? (
+            <motion.form
+              onSubmit={handleSubmit}
+              className="space-y-6"
+              animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
+              transition={{ duration: 0.4 }}
             >
-              {loading ? (
-                <FiLoader className="w-5 h-5 animate-spin" />
-              ) : (
-                "Sign In"
+              <div>
+                <label className="block text-blue-200 text-sm font-medium mb-2">
+                  Aadhar Card Number
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiMail className="h-5 w-5 text-blue-300" />
+                  </div>
+                  <input
+                    type="text"
+                    name="aadharCardNumber"
+                    value={formData.aadharCardNumber}
+                    onChange={handleChange}
+                    required
+                    className="bg-white/10 w-full pl-10 pr-3 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="123412341234"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-blue-200 text-sm font-medium mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiLock className="h-5 w-5 text-blue-300" />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="bg-white/10 w-full pl-10 pr-10 py-2 rounded-lg border border-white/20 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    {showPassword ? (
+                      <FiEyeOff className="h-5 w-5 text-blue-300 hover:text-blue-200 transition-colors" />
+                    ) : (
+                      <FiEye className="h-5 w-5 text-blue-300 hover:text-blue-200 transition-colors" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 text-red-400 text-sm"
+                >
+                  <FiAlertCircle className="h-4 w-4" />
+                  <span>{error}</span>
+                </motion.div>
               )}
-            </motion.button>
 
-            <p className="text-center text-blue-200">
-              Don't have an account?{" "}
-              <Link
-                href="/signup"
-                className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center py-3 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-300"
               >
-                Sign up
-              </Link>
-            </p>
-          </motion.form>
+                {loading ? <FiLoader className="w-5 h-5 animate-spin" /> : "Sign In"}
+              </motion.button>
 
-          <div className="mt-8">
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-transparent text-blue-200">
-                Or continue with
-              </span>
+              <p className="text-center text-blue-200">
+                Don't have an account?{" "}
+                <Link
+                  href="/signup"
+                  className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  Sign up
+                </Link>
+              </p>
+            </motion.form>
+          ) : (
+            <div className="text-center text-white p-8">
+              <h2 className="text-2xl font-bold">You are logged in!</h2>
+              <p>Google email: {googleUser.email}</p>
             </div>
-            <div className="mt-4 flex justify-center">
-              <GoogleProvider>
-                <GoogleLoginButton />
-              </GoogleProvider>
-            </div>
-          </div>
+          )}
 
+          {!googleUser && (
+            <div className="mt-8">
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-transparent text-blue-200">
+                  Or continue with
+                </span>
+              </div>
+              <div className="mt-4 flex justify-center">
+                <GoogleProviderWrapper>
+                  <GoogleLoginButton
+                    onSuccess={(response) => {
+                      console.log("Google User Info:", response);
+                      setGoogleUser(response);
+                    }}
+                    onError={() => {
+                      console.log("Google login failed");
+                    }}
+                  />
+                </GoogleProviderWrapper>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

@@ -8,30 +8,20 @@
 // const nextConfig = {
 //   reactStrictMode: true,
 // };
-
-// export default nextConfig;
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
   async headers() {
     return [
       {
-        source: '/(.*)', // all routes
+        source: "/(.*)",
         headers: [
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
-          },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
-          },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+          { key: "Cross-Origin-Embedder-Policy", value: "unsafe-none" },
         ],
       },
     ];
   },
 };
 
-// ✅ ES module export
-export default nextConfig;
+module.exports = nextConfig;
