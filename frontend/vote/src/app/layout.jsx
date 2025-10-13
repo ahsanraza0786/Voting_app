@@ -48,15 +48,19 @@
 
 // app/layout.jsx
 
-import "./globals.css";
-import GoogleProvider from "./providers/googleProvider";
+// pages/_app.js or app/layout.js (Next.js 13+)
+import Script from "next/script";
+import "../styles/globals.css";
 
-export default function RootLayout({ children }) {
+export default function App({ Component, pageProps }) {
   return (
-    <html lang="en">
-      <body>
-        <GoogleProvider>{children}</GoogleProvider>
-      </body>
-    </html>
+    <>
+      {/* Google Identity Services script */}
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="beforeInteractive"
+      />
+      <Component {...pageProps} />
+    </>
   );
 }

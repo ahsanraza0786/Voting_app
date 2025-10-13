@@ -8,7 +8,7 @@ const app = express();
 const db = require("./db");
 const { jwtAuthMiddleware } = require("./jwt");
 
-// Configure CORS
+// ---------- CORS CONFIGURATION ----------
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
@@ -35,36 +35,37 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-// Serve uploaded files
+// ---------- STATIC FILES ----------
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Import routes
+// ---------- ROUTES ----------
 const userRoutes = require("./routes/userRoutes");
 const candidateRoutes = require("./routes/candidateRoutes");
 const electionRoutes = require("./routes/electionRoutes");
 const voteRoutes = require("./routes/voteRoutes");
-const googleRoutes = require("./routes/googleRoutes"); // only once!
+const googleRoutes = require("./routes/googleRoutes"); // Google OAuth routes
 
-// Mount routes
+// Mount main routes
 app.use("/user", userRoutes);
 app.use("/candidate", candidateRoutes);
 app.use("/election", electionRoutes);
 app.use("/vote", voteRoutes);
 
-// Mount Google OAuth routes
+// Mount Google OAuth routes under /api/auth
 app.use("/api/auth", googleRoutes);
 
-// Test route
+// ---------- TEST ROUTE ----------
 app.get("/", (req, res) => {
   res.send("Hello from server");
 });
 
+// ---------- START SERVER ----------
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
 
-// Global error handlers
+// ---------- GLOBAL ERROR HANDLERS ----------
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
