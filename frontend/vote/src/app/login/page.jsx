@@ -6,6 +6,7 @@ import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiLoader } from "react-
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import GoogleProviderWrapper from "@/app/providers/googleProvider";
+import { useRouter } from "next/navigation"; // <-- added
 
 const GoogleLoginButton = dynamic(
   () => import("@/components/GoogleLoginButton"),
@@ -13,6 +14,7 @@ const GoogleLoginButton = dynamic(
 );
 
 export default function Login() {
+  const router = useRouter(); // <-- added
   const [formData, setFormData] = useState({ aadharCardNumber: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,6 +42,7 @@ export default function Login() {
 
       localStorage.setItem("token", data.token);
       alert("Logged in successfully!");
+      router.push("/dashboard"); // redirect after login
     } catch (err) {
       setError(err.message || "Invalid credentials");
     } finally {
@@ -49,8 +52,14 @@ export default function Login() {
 
   const handleGoogleSuccess = (credentialResponse) => {
     console.log("Google Credential:", credentialResponse);
+
+    // Save token in localStorage
+    localStorage.setItem("token", credentialResponse.credential);
+
     setGoogleUser(credentialResponse);
-    alert("Google login successful! Check console for details.");
+
+    // Redirect to dashboard
+    router.push("/dashboard");
   };
 
   const handleGoogleError = () => {
