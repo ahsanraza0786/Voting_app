@@ -6,57 +6,9 @@ const Candidate = require("./../models/candidate");
 const { jwtAuthMiddleware, generateToken, adminAuthMiddleware } = require("./../jwt");
 //  const View = require("./../View/signup.ejs");
 
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // Add in .env
 
-// POST route to add a person
-// router.post("/signup", async (req, res) => {
-//   try {
-//     const data = req.body; // Assuming the request body contains the User data
-
-//     // Check if there is already an admin user
-//     const adminUser = await User.findOne({ role: "admin" });
-//     if (data.role === "admin" && adminUser) {
-//       return res.status(400).json({ error: "Admin user already exists" });
-//     }
-
-//     // Validate Aadhar Card Number must have exactly 12 digit
-//     if (!/^\d{12}$/.test(data.aadharCardNumber)) {
-//       return res
-//         .status(400)
-//         .json({ error: "Aadhar Card Number must be exactly 12 digits" });
-//     }
-
-//     // Check if a user with the same Aadhar Card Number already exists
-//     const existingUser = await User.findOne({
-//       aadharCardNumber: data.aadharCardNumber,
-//     });
-//     if (existingUser) {
-//       return res
-//         .status(400)
-//         .json({
-//           error: "User with the same Aadhar Card Number already exists",
-//         });
-//     }
-
-//     // Create a new User document using the Mongoose model
-//     const newUser = new User(data);
-
-//     // Save the new user to the database
-//     const response = await newUser.save();
-//     console.log("data saved");
-
-//     const payload = {
-//       id: response.id,
-//     };
-//     // console.log(JSON.stringify(payload));
-//     const token = generateToken(payload);
-
-//     res.status(200).json({ response: response, token: token });
-//     res.send(`User signup succesfully `);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
 
 router.post("/signup", async (req, res) => {
   try {
@@ -212,5 +164,43 @@ router.get('/admin/dashboard', adminAuthMiddleware, async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+// Google Login
+router.post("/google-login", async (req, res) => {
+  const { token } = req.body; // token sent from frontend
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+    if (!user) {
+      // If not, create new user
+      user = await User.create({
+        email,
+        name: payload.name,
+        role: "user", // default role
+        aadharCardNumber: null, // optional, because Google login might not have it
+        password: null,
+      });
+    }
+
+    // Generate backend JWT
+    const jwtToken = generateToken({ id: user._id });
+
+    res.json({ token: jwtToken, user });
+  } catch (err) {
+    console.error("Google login error:", err);
+    res.status(400).json({ message: "Google login failed" });
+  }
+});
+
 
 module.exports = router;
