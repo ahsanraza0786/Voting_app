@@ -50,7 +50,8 @@
 
 // pages/_app.js or app/layout.js (Next.js 13+)
 import Script from "next/script";
-import "./globals.css"; // relative to layout.jsx
+import '../app/globals.css'; // instead of '../styles/globals.css'
+
 
 
 export default function App({ Component, pageProps }) {
