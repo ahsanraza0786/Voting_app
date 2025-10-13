@@ -1,14 +1,9 @@
-// src/app/providers/googleProvider.jsx
-"use client";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-import { GoogleOAuthProvider } from "@react-oauth/google";
-
-const GoogleProvider = ({ children }) => {
-  return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
-      {children}
-    </GoogleOAuthProvider>
-  );
-};
-
-export default GoogleProvider;
+<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+  <GoogleLogin
+    onSuccess={credentialResponse => handleGoogleSuccess(credentialResponse)}
+    onError={() => handleGoogleError()}
+    useOneTap={false} // Disable One Tap to prevent COOP issues
+  />
+</GoogleOAuthProvider>

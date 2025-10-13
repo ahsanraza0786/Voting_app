@@ -51,24 +51,24 @@ export default function Login() {
     }
   };
 
-const handleGoogleSuccess = async (credentialResponse) => {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: credentialResponse.credential }),
-    });
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Google login failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google login failed");
 
-    localStorage.setItem("token", data.token); // Save JWT
-    router.push("/dashboard"); // Redirect after success
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
-};
+      localStorage.setItem("token", data.token); // Save JWT
+      router.push("/dashboard"); // Redirect after success
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  };
 
 
 
@@ -147,8 +147,17 @@ const handleGoogleSuccess = async (credentialResponse) => {
           <div className="mt-8 flex flex-col items-center">
             <p className="text-blue-200 mb-2">Or continue with</p>
             <GoogleProviderWrapper>
-              <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+              <GoogleLoginButton
+                onSuccess={(credentialResponse) => {
+                  console.log("Google Credential:", credentialResponse);
+                  localStorage.setItem("token", credentialResponse.credential);
+                  setGoogleUser(credentialResponse);
+                  router.push("/dashboard"); // redirect after login
+                }}
+                onError={() => alert("Google login failed!")}
+              />
             </GoogleProviderWrapper>
+
           </div>
 
           {googleUser && (
