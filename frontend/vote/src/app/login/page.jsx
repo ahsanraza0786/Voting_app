@@ -52,9 +52,6 @@ export default function Login() {
   };
 
 const handleGoogleSuccess = async (credentialResponse) => {
-  setLoading(true);
-  setError("");
-
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, {
       method: "POST",
@@ -63,18 +60,16 @@ const handleGoogleSuccess = async (credentialResponse) => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Google login failed");
+    if (!res.ok) throw new Error(data.error || "Google login failed");
 
-    // Save backend JWT, not Google credential
-    localStorage.setItem("token", data.token);
-    setGoogleUser(data.user);
-    router.push("/dashboard");
+    localStorage.setItem("token", data.token); // Save JWT
+    router.push("/dashboard"); // Redirect after success
   } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
+    console.error(err);
+    alert(err.message);
   }
 };
+
 
 
   const handleGoogleError = () => {

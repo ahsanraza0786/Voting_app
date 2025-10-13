@@ -44,6 +44,9 @@ const candidateRoutes = require("./routes/candidateRoutes");
 const electionRoutes = require("./routes/electionRoutes");
 const voteRoutes = require("./routes/voteRoutes");
 
+const googleRoutes = require("./routes/googleRoutes");
+
+
 
 
 // // Use the routers
@@ -58,6 +61,8 @@ app.use("/user", userRoutes);
 app.use("/candidate", candidateRoutes);
 app.use("/election", electionRoutes);
 app.use("/vote", voteRoutes);
+app.use("/user", googleRoutes);
+
 
 
 
