@@ -1,95 +1,74 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
-const db = require("./db");
+const path = require("path");
+const bodyParser = require("body-parser");
 require("dotenv").config();
 
-// Configure CORS to allow common local dev ports and credentials
+const app = express();
+const db = require("./db");
+const { jwtAuthMiddleware } = require("./jwt");
+
+// Configure CORS
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:5173',
-  'http://localhost:300',
- 'https://voting-app-rust.vercel.app', // frontend URL
-    
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:5173",
+  "http://localhost:300",
+  "https://voting-app-rust.vercel.app",
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (process.env.NODE_ENV !== 'production') return callback(null, true);
+    if (!origin) return callback(null, true); // allow non-browser requests
+    if (process.env.NODE_ENV !== "production") return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: 'GET,POST,PUT,DELETE,OPTIONS',
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
+app.use(bodyParser.json());
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.json()); // req.body use the middleware 
-const PORT = process.env.PORT || 8080;
+// Serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const { jwtAuthMiddleware } = require("./jwt");
-
-// Import the router files
+// Import routes
 const userRoutes = require("./routes/userRoutes");
 const candidateRoutes = require("./routes/candidateRoutes");
 const electionRoutes = require("./routes/electionRoutes");
 const voteRoutes = require("./routes/voteRoutes");
+const googleRoutes = require("./routes/googleRoutes"); // only once!
 
-const googleRoutes = require("./routes/googleRoutes");
-
-
-
-
-// // Use the routers
-// app.get("/", (req, res) => {
-//   res.send("Hello from server");
-  
-// });
-// Serve uploaded files statically
-const path = require('path');
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Mount routes
 app.use("/user", userRoutes);
 app.use("/candidate", candidateRoutes);
 app.use("/election", electionRoutes);
 app.use("/vote", voteRoutes);
-app.use("/user", googleRoutes);
 
-
-
-
-// Import Google OAuth authentication routes from the googleRoutes module
-// This module contains endpoints for handling Google authentication flow
-const googleRoutes = require("./routes/googleRoutes");
-
-// Mount the Google authentication routes under the "/api/auth" base path
-// This means all routes defined in googleRoutes will be accessible at:
-// - /api/auth/google (initiates Google OAuth)
-// - /api/auth/google/callback (handles OAuth callback from Google)
-// - /api/auth/google/success (returns success response after authentication)
-// - /api/auth/google/failure (handles authentication failures)
-
+// Mount Google OAuth routes
 app.use("/api/auth", googleRoutes);
 
+// Test route
+app.get("/", (req, res) => {
+  res.send("Hello from server");
+});
 
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
 
-// Global error handlers to surface any uncaught errors
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+// Global error handlers
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception thrown:', err);
-  // Optional: process.exit(1) to crash and restart under a process manager
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception thrown:", err);
 });

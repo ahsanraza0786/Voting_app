@@ -24,7 +24,12 @@
 // export default nextConfig;
 
 
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  images: {
+    domains: [], // leave empty if no external images
+  },
   async headers() {
     return [
       {
@@ -32,14 +37,17 @@ module.exports = {
         headers: [
           {
             key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin-allow-popups',
+            value: 'same-origin-allow-popups', // needed for Google OAuth popup
           },
           {
             key: 'Cross-Origin-Embedder-Policy',
-            value: 'unsafe-none',
+            value: 'unsafe-none', // needed for Google OAuth popup
           },
         ],
       },
     ];
   },
 };
+
+export default nextConfig;
+
