@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff, FiAlertCircle, FiLoader } from "react-icons/fi";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import GoogleProviderWrapper from "@/app/providers/googleProvider";
 
+// Dynamic import for Google Login Button
 const GoogleLoginButton = dynamic(
   () => import("@/components/GoogleLoginButton"),
   { ssr: false }
@@ -14,19 +14,16 @@ const GoogleLoginButton = dynamic(
 
 export default function Login() {
   const router = useRouter();
-
   const [formData, setFormData] = useState({ aadharCardNumber: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [googleUser, setGoogleUser] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
   };
 
-  // Traditional login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -53,32 +50,31 @@ export default function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
+      const token = credentialResponse.credential;
+
+      // Send token to backend for verification or save locally
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: credentialResponse.credential }),
+        body: JSON.stringify({ token }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Google login failed");
 
-      localStorage.setItem("token", data.token); // Save JWT
-      router.push("/dashboard"); // Redirect after success
+      localStorage.setItem("token", data.token);
+      router.push("/dashboard");
     } catch (err) {
-      console.error(err);
-      alert(err.message);
+      setError(err.message || "Google login failed");
     }
   };
 
-
-
   const handleGoogleError = () => {
-    setError("Google login failed");
+    setError("Google login failed!");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-violet-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8 relative">
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
@@ -146,26 +142,8 @@ export default function Login() {
 
           <div className="mt-8 flex flex-col items-center">
             <p className="text-blue-200 mb-2">Or continue with</p>
-            <GoogleProviderWrapper>
-              <GoogleLoginButton
-                onSuccess={(credentialResponse) => {
-                  console.log("Google Credential:", credentialResponse);
-                  localStorage.setItem("token", credentialResponse.credential);
-                  setGoogleUser(credentialResponse);
-                  router.push("/dashboard"); // redirect after login
-                }}
-                onError={() => alert("Google login failed!")}
-              />
-            </GoogleProviderWrapper>
-
+            <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
           </div>
-
-          {googleUser && (
-            <div className="mt-4 p-4 bg-blue-900/20 rounded-lg text-white">
-              <p>Google User Info:</p>
-              <pre>{JSON.stringify(googleUser, null, 2)}</pre>
-            </div>
-          )}
         </div>
       </div>
     </div>
