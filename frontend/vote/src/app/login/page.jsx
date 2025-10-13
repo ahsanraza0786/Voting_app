@@ -51,30 +51,31 @@ export default function Login() {
     }
   };
 
-  // Google login
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setLoading(true);
-    setError("");
+const handleGoogleSuccess = async (credentialResponse) => {
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-      });
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: credentialResponse.credential }),
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Google login failed");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Google login failed");
 
-      localStorage.setItem("token", data.token);
-      setGoogleUser(data.user);
-      router.push("/dashboard");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Save backend JWT, not Google credential
+    localStorage.setItem("token", data.token);
+    setGoogleUser(data.user);
+    router.push("/dashboard");
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleGoogleError = () => {
     setError("Google login failed");

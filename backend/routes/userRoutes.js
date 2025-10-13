@@ -166,39 +166,34 @@ router.get('/admin/dashboard', adminAuthMiddleware, async (req, res) => {
 });
 
 
-// Google Login
-router.post("/google-login", async (req, res) => {
-  const { token } = req.body; // token sent from frontend
 
+router.post("/google-login", async (req, res) => {
+  const { token } = req.body;
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-
     const payload = ticket.getPayload();
-    const email = payload.email;
 
-    // Check if user exists
-    let user = await User.findOne({ email });
+    // Check if user exists, if not create
+    let user = await User.findOne({ email: payload.email });
     if (!user) {
-      // If not, create new user
-      user = await User.create({
-        email,
+      user = new User({
         name: payload.name,
-        role: "user", // default role
-        aadharCardNumber: null, // optional, because Google login might not have it
-        password: null,
+        email: payload.email,
+        password: "google_auth", // dummy password
+        aadharCardNumber: "000000000000", // placeholder, if required
       });
+      await user.save();
     }
 
-    // Generate backend JWT
+    // Generate JWT token for your frontend
     const jwtToken = generateToken({ id: user._id });
-
-    res.json({ token: jwtToken, user });
+    return res.status(200).json({ user, token: jwtToken });
   } catch (err) {
-    console.error("Google login error:", err);
-    res.status(400).json({ message: "Google login failed" });
+    console.error(err);
+    return res.status(400).json({ message: "Google login failed" });
   }
 });
 

@@ -44,11 +44,13 @@ const candidateRoutes = require("./routes/candidateRoutes");
 const electionRoutes = require("./routes/electionRoutes");
 const voteRoutes = require("./routes/voteRoutes");
 
-// Use the routers
-app.get("/", (req, res) => {
-  res.send("Hello from server");
+
+
+// // Use the routers
+// app.get("/", (req, res) => {
+//   res.send("Hello from server");
   
-});
+// });
 // Serve uploaded files statically
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -56,6 +58,7 @@ app.use("/user", userRoutes);
 app.use("/candidate", candidateRoutes);
 app.use("/election", electionRoutes);
 app.use("/vote", voteRoutes);
+
 
 
 // Import Google OAuth authentication routes from the googleRoutes module
