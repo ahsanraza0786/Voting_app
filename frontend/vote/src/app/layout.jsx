@@ -50,7 +50,7 @@
 
 // pages/_app.js or app/layout.js (Next.js 13+)
 import Script from "next/script";
-import '../app/globals.css'; // instead of '../styles/globals.css'
+import './globals.css'; // instead of '../styles/globals.css'
 
 
 
