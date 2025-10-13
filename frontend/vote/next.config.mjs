@@ -23,31 +23,16 @@
 
 // export default nextConfig;
 
-
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  images: {
-    domains: [], // leave empty if no external images
-  },
+export default {
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin-allow-popups', // needed for Google OAuth popup
-          },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'unsafe-none', // needed for Google OAuth popup
-          },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'unsafe-none' },
         ],
       },
     ];
   },
 };
-
-export default nextConfig;
-
