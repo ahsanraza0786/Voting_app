@@ -14,7 +14,10 @@ const GoogleLoginButton = dynamic(
 
 export default function Login() {
   const router = useRouter();
-  const [formData, setFormData] = useState({ aadharCardNumber: "", password: "" });
+  const [formData, setFormData] = useState({
+    aadharCardNumber: "",
+    password: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +43,13 @@ export default function Login() {
       if (!res.ok) throw new Error(data.error || "Login failed");
 
       localStorage.setItem("token", data.token);
-      router.push("/dashboard");
+
+      // ✅ Redirect based on user role
+      if (data.role === "admin") {
+        router.push("/election-management");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       setError(err.message || "Invalid credentials");
     } finally {
@@ -52,17 +61,23 @@ export default function Login() {
     try {
       const token = credentialResponse.credential;
 
-      // Send token to backend for verification or save locally
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user/google-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Google login failed");
 
       localStorage.setItem("token", data.token);
-      router.push("/dashboard");
+
+      // ✅ Redirect based on user role
+      if (data.role === "admin") {
+        router.push("/election-management");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       setError(err.message || "Google login failed");
     }
@@ -83,7 +98,9 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-blue-200 text-sm font-medium mb-2">Aadhar Card Number</label>
+              <label className="block text-blue-200 text-sm font-medium mb-2">
+                Aadhar Card Number
+              </label>
               <input
                 type="text"
                 name="aadharCardNumber"
@@ -96,7 +113,9 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-blue-200 text-sm font-medium mb-2">Password</label>
+              <label className="block text-blue-200 text-sm font-medium mb-2">
+                Password
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -112,7 +131,11 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
-                  {showPassword ? <FiEyeOff className="h-5 w-5 text-blue-300" /> : <FiEye className="h-5 w-5 text-blue-300" />}
+                  {showPassword ? (
+                    <FiEyeOff className="h-5 w-5 text-blue-300" />
+                  ) : (
+                    <FiEye className="h-5 w-5 text-blue-300" />
+                  )}
                 </button>
               </div>
             </div>
@@ -134,7 +157,10 @@ export default function Login() {
 
             <p className="text-center text-blue-200">
               Don't have an account?{" "}
-              <Link href="/signup" className="font-medium text-blue-400 hover:text-blue-300">
+              <Link
+                href="/signup"
+                className="font-medium text-blue-400 hover:text-blue-300"
+              >
                 Sign up
               </Link>
             </p>
@@ -142,7 +168,10 @@ export default function Login() {
 
           <div className="mt-8 flex flex-col items-center">
             <p className="text-blue-200 mb-2">Or continue with</p>
-            <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+            <GoogleLoginButton
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+            />
           </div>
         </div>
       </div>
