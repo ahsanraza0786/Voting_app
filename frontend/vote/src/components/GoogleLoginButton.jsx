@@ -1,8 +1,9 @@
 "use client";
-
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
+
+const base = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
 
 export default function GoogleLoginButton() {
   const router = useRouter();
@@ -22,43 +23,37 @@ export default function GoogleLoginButton() {
   }, []);
 
   const handleCredentialResponse = async (response) => {
-    const loadingToast = toast.loading("Signing in with Google...");
+    const credential = response.credential;
+    if (!credential) {
+      toast.error("No Google credential received!");
+      return;
+    }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE}/auth/google-login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ credential: response.credential }),
-        }
-      );
+      const res = await fetch(`${base}/auth/google-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential }),
+      });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Google login failed");
 
+      if (!res.ok) {
+        console.error("Login failed:", data);
+        toast.error(data.error || "Google login failed!");
+        return;
+      }
+
+      // Save token
       localStorage.setItem("token", data.token);
 
-      toast.dismiss(loadingToast);
       toast.success("Login successful!");
-
-      // Redirect based on role
-      if (data.role === "admin") {
-        router.push("/election-management");
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/election-management"); // redirect for admin
     } catch (err) {
       console.error("Google login error:", err);
-      toast.dismiss(loadingToast);
-      toast.error("Google login failed. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
-  return (
-    <>
-      <div id="googleSignInDiv"></div>
-      <Toaster position="top-right" reverseOrder={false} />
-    </>
-  );
+  return <div id="googleSignInDiv"></div>;
 }
