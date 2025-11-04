@@ -48,7 +48,7 @@ export default function Login() {
       if (data.role === "admin") {
         router.push("/election-management");
       } else {
-        router.push("/dashboard");
+        router.push("/dashboard/candidates");
       }
     } catch (err) {
       setError(err.message || "Invalid credentials");
