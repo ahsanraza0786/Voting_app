@@ -1,13 +1,13 @@
-"use client"; // if using Next.js 13+ app directory
+"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function GoogleLoginButton() {
   const router = useRouter();
 
   useEffect(() => {
-    /* global google */
     if (window.google) {
       google.accounts.id.initialize({
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -22,27 +22,43 @@ export default function GoogleLoginButton() {
   }, []);
 
   const handleCredentialResponse = async (response) => {
-    console.log("Google Credential:", response);
+    const loadingToast = toast.loading("Signing in with Google...");
 
     try {
-      // Send credential to your backend
-      const res = await fetch("https://your-backend-domain.com/api/auth/google-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential: response.credential }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE}/auth/google-login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ credential: response.credential }),
+        }
+      );
 
       const data = await res.json();
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        router.push("/dashboard"); // redirect after login
+      if (!res.ok) throw new Error(data.error || "Google login failed");
+
+      localStorage.setItem("token", data.token);
+
+      toast.dismiss(loadingToast);
+      toast.success("Login successful!");
+
+      // Redirect based on role
+      if (data.role === "admin") {
+        router.push("/election-management");
       } else {
-        console.error("Login failed:", data);
+        router.push("/dashboard");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Google login error:", err);
+      toast.dismiss(loadingToast);
+      toast.error("Google login failed. Please try again.");
     }
   };
 
-  return <div id="googleSignInDiv"></div>;
+  return (
+    <>
+      <div id="googleSignInDiv"></div>
+      <Toaster position="top-right" reverseOrder={false} />
+    </>
+  );
 }

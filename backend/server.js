@@ -52,7 +52,7 @@ app.use("/election", electionRoutes);
 app.use("/vote", voteRoutes);
 
 // Mount Google OAuth routes under /api/auth
-app.use("/api/auth", googleRoutes);
+app.use("/auth", googleRoutes);
 
 // ---------- TEST ROUTE ----------
 app.get("/", (req, res) => {
